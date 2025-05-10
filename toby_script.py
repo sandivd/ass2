@@ -160,7 +160,7 @@ merged_df['acc_veh'] = merged_df['AGE'].apply(
     lambda age: 'Old' if age > 10 else ('New' if pd.notnull(age) else np.nan)
     )
 
-severity_map = {1: '1: Fatal', 2: '2: Serious Injury', 3: '3: Other Injury'}
+severity_map = {1: '1: Fatal accident', 2: '2: Serious injury accident', 3: '3: Other injury accident', 4: '4: Non injury accident'}
 merged_df['SEVERITY_DESC'] = merged_df['SEVERITY'].map(severity_map).fillna('Unknown')
 
 keep_column_acc_veh = [
@@ -170,10 +170,4 @@ keep_column_acc_veh = [
 ]
 
 merged_df = merged_df[keep_column_acc_veh]
-merged_df.head()
-    
-
-
-
-
-
+print(merged_df.head())
