@@ -7,15 +7,9 @@ import seaborn as sns
 PROCESSED_DATA_PATH = 'final_processed_data.csv'
 
 # load processed data
-try:
-    merged_df = pd.read_csv(PROCESSED_DATA_PATH)
-    print(f"Processed data loaded from '{PROCESSED_DATA_PATH}': {merged_df.shape[0]} rows, {merged_df.shape[1]} columns")
-except FileNotFoundError:
-    print(f"CRITICAL ERROR: Processed data file '{PROCESSED_DATA_PATH}' not found.")
-    exit()
-except Exception as e:
-    print(f"An error occurred while loading the CSV: {e}")
-    exit()
+merged_df = pd.read_csv(PROCESSED_DATA_PATH)
+print(f"Processed data loaded from '{PROCESSED_DATA_PATH}': {merged_df.shape[0]} rows, {merged_df.shape[1]} columns")
+
 
 # print(f"Columns available: {merged_df.columns.tolist()}")
 
