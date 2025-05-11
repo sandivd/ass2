@@ -8,19 +8,11 @@ PROCESSED_DATA_PATH = 'final_processed_data.csv'
 
 # load processed data
 merged_df = pd.read_csv(PROCESSED_DATA_PATH)
-print(f"Processed data loaded from '{PROCESSED_DATA_PATH}': {merged_df.shape[0]} rows, {merged_df.shape[1]} columns")
-
-
-# print(f"Columns available: {merged_df.columns.tolist()}")
 
 # visualization setup
 sns.set_theme(style="whitegrid")
 plt.style.use('seaborn-v0_8-colorblind')
 
-# Ensure SEVERITY_DESC is available
-if 'SEVERITY_DESC' not in merged_df.columns:
-    print("Error: 'SEVERITY_DESC' column is missing from the loaded CSV.")
-    exit()
 
 # Visualization 1: Overall Severity Distribution
 plt.figure(figsize=(8, 6))
