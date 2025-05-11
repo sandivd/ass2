@@ -66,16 +66,7 @@ plt.close()
 
 # Visualization 3: Severity vs. Vehicle Age Group
 plt.figure(figsize=(10, 6))
-vehicle_id_col_name = 'VEHICLE_ID_x' # As confirmed by Toby
-if vehicle_id_col_name not in merged_df.columns:
-    # Fallback if the exact name changed or was different in a run
-    potential_id_cols = [col for col in ['VEHICLE_ID_veh', 'VEHICLE_ID'] if col in merged_df.columns]
-    if potential_id_cols:
-        vehicle_id_col_name = potential_id_cols[0]
-        print(f"Warning: '{vehicle_id_col_name}' being used as vehicle identifier for Vis 3.")
-    else:
-        print(f"Critical Error: No suitable VEHICLE_ID column found for Vis 3.")
-        vehicle_id_col_name = 'ACCIDENT_NO' # Incorrect fallback to prevent crash
+vehicle_id_col_name = 'VEHICLE_ID_x'
 
 vehicle_level_df_vis3 = merged_df.drop_duplicates(subset=['ACCIDENT_NO', vehicle_id_col_name])
 vehicle_age_order = ['0-4 years', '5-9 years', '10-14 years', '15+ years', 'Unknown']
