@@ -171,3 +171,8 @@ keep_column_acc_veh = [
 
 merged_df = merged_df[keep_column_acc_veh]
 print(merged_df.head())
+
+
+# Save the cleaned data to a new CSV file
+merged_df.to_csv('final_processed_data.csv', index=False)
+print("\nFinal merged_df saved to 'final_processed_data.csv'")
