@@ -176,3 +176,73 @@ print(merged_df.head())
 # Save the cleaned data to a new CSV file
 merged_df.to_csv('final_processed_data.csv', index=False)
 print("\nFinal merged_df saved to 'final_processed_data.csv'")
+
+
+
+
+# Below is to supplement the modeling data preparation
+
+print("\n--- Preparing data specifically for modeling ---")
+
+# Re-derive DAY_WEEK_DESC if it's not already in acc_veh
+if 'DAY_WEEK_DESC' not in acc_veh.columns and 'DAY_OF_WEEK' in acc_veh.columns:
+    day_map = {1: 'Sunday', 2: 'Monday', 3: 'Tuesday', 4: 'Wednesday', 5: 'Thursday', 6: 'Friday', 7: 'Saturday'}
+    acc_veh['DAY_WEEK_DESC'] = acc_veh['DAY_OF_WEEK'].map(day_map).fillna('Unknown')
+elif 'DAY_WEEK_DESC' not in acc_veh.columns: # If base DAY_OF_WEEK is also missing
+    print("Warning: DAY_OF_WEEK missing from acc_veh, cannot create DAY_WEEK_DESC for modeling data.")
+    acc_veh['DAY_WEEK_DESC'] = 'Unknown' # Create with a default
+
+# Re-derive ROAD_GEOMETRY_DESC if it's not already in acc_veh
+if 'ROAD_GEOMETRY_DESC' not in acc_veh.columns and 'ROAD_GEOMETRY' in acc_veh.columns:
+    road_geom_map = {
+        1: 'Cross intersection', 2: 'T intersection', 3: 'Y intersection',
+        4: 'Multiple intersection', 5: 'Not at intersection',
+        9: 'Unknown', 0: 'Not Applicable'
+    }
+    acc_veh['ROAD_GEOMETRY_DESC'] = acc_veh['ROAD_GEOMETRY'].map(road_geom_map).fillna('Unknown')
+elif 'ROAD_GEOMETRY_DESC' not in acc_veh.columns: # If base ROAD_GEOMETRY is also missing
+    print("Warning: ROAD_GEOMETRY missing from acc_veh, cannot create ROAD_GEOMETRY_DESC for modeling data.")
+    acc_veh['ROAD_GEOMETRY_DESC'] = 'Unknown' # Create with a default
+
+# Ensure NO_OF_VEHICLES is present (it should be if df_accident was merged correctly)
+if 'NO_OF_VEHICLES' not in acc_veh.columns:
+    print("Warning: NO_OF_VEHICLES missing from acc_veh for modeling data. This is unexpected.")
+    acc_veh['NO_OF_VEHICLES'] = np.nan # Or some other default if missing
+
+# Create the accident-level DataFrame for modeling
+# Use acc_veh and drop duplicates by ACCIDENT_NO to get one row per accident
+accident_level_data_for_model = acc_veh.drop_duplicates(subset=['ACCIDENT_NO']).copy()
+
+# 1. Create the target variable for modeling
+accident_level_data_for_model['IS_SERIOUS_FATAL'] = np.where(
+    accident_level_data_for_model['SEVERITY'].isin([1, 2]), 1, 0
+)
+
+# 2. Define the list of features to be used for modeling
+features_for_model_list = [
+    'SPEED_ZONE_GROUP',
+    'LIGHT_CONDITION_DESC',
+    'DAY_WEEK_DESC',
+    'ROAD_GEOMETRY_DESC',
+    'NO_OF_VEHICLES'
+]
+
+# 3. Columns to include in the modeling CSV: ACCIDENT_NO, target, and features
+columns_for_modeling_csv = ['ACCIDENT_NO', 'IS_SERIOUS_FATAL', 'SEVERITY'] + features_for_model_list
+
+# 4. Create the DataFrame for modeling by selecting only the necessary columns
+# Ensure all these columns actually exist in accident_level_data_for_model
+actual_columns_for_modeling = [col for col in columns_for_modeling_csv if col in accident_level_data_for_model.columns]
+missing_cols_for_modeling_df = set(columns_for_modeling_csv) - set(actual_columns_for_modeling)
+
+if missing_cols_for_modeling_df:
+    print(f"WARNING: The following columns were intended for 'data_for_modeling.csv' but are MISSING from the source DataFrame: {missing_cols_for_modeling_df}")
+    print(f"Available columns in accident_level_data_for_model before selection: {accident_level_data_for_model.columns.tolist()}")
+
+df_for_modeling = accident_level_data_for_model[actual_columns_for_modeling].copy() # Use .copy() to avoid SettingWithCopyWarning
+
+# 5. Save this new DataFrame to its own CSV
+df_for_modeling.to_csv('data_for_modeling.csv', index=False)
+print("\nCreated and saved 'data_for_modeling.csv' for modeling.")
+print(f"Columns in 'data_for_modeling.csv': {df_for_modeling.columns.tolist()}")
+print(df_for_modeling.head())
