@@ -115,7 +115,7 @@ cols_to_fill = df_vehicle.columns.difference(['VEHICLE_YEAR_MANUF'])
 df_vehicle[cols_to_fill] = df_vehicle[cols_to_fill].fillna(v_modes)
 
 
-acc_veh = pd.merge(df_accident, df_vehicle, on='ACCIDENT_NO', how='left')
+acc_veh = pd.merge(df_accident, df_vehicle, on='ACCIDENT_NO', how='inner')
 
 # now get the age of the vehicle
 acc_veh['AGE'] = acc_veh['acc_year'] - acc_veh['VEHICLE_YEAR_MANUF']
@@ -155,7 +155,7 @@ light_condition_map = {
 }
 acc_veh['LIGHT_CONDITION_DESC'] = acc_veh['LIGHT_CONDITION'].map(light_condition_map)
 
-merged_df = pd.merge(acc_veh, df_person, on='ACCIDENT_NO', how='left')
+merged_df = pd.merge(acc_veh, df_person, on='ACCIDENT_NO', how='inner')
 merged_df['acc_veh'] = merged_df['AGE'].apply(
     lambda age: 'Old' if age > 10 else ('New' if pd.notnull(age) else np.nan)
     )
